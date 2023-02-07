@@ -11,6 +11,8 @@ import (
 func main() {
 	fmt.Println("Welcome to ACF Database. Please enter a command.")
 
+	app.Init()
+
 	commandScanner := bufio.NewScanner(os.Stdin)
 
 	var command string
@@ -24,12 +26,14 @@ func main() {
 		if command != "END" {
 			response, err := app.Interpret(command)
 
+			// interpreter errors throw for invalid commands and for command usage errors
 			if err != nil {
 				fmt.Println(err.Error())
-				os.Exit(1)
 			}
 
-			fmt.Println(response)
+			if response != "" {
+				fmt.Println(response)
+			}
 		}
 	}
 }
