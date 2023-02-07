@@ -26,3 +26,27 @@ func getValue(name string) string {
 
 	return "NULL"
 }
+
+func countValues(value string) int {
+	count, ok := databaseValues[value]
+
+	if ok {
+		return count
+	}
+
+	return 0
+}
+
+func deleteValue(name string) {
+	value, ok := databaseNames[name]
+
+	if ok {
+		delete(databaseNames, name)
+		count := databaseValues[value]
+
+		if count > 0 {
+			count -= 1
+			databaseValues[value] = count
+		}
+	}
+}

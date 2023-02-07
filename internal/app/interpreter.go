@@ -1,7 +1,9 @@
 package app
 
 import (
+	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -30,19 +32,33 @@ func Interpret(command string) (string, error) {
 		setValue(args[1], args[2])
 
 	case "DELETE":
+		err := checkArgs(args, 2, "[name]")
+
+		if err != nil {
+			return "", err
+		}
+
+		deleteValue(args[1])
 	case "COUNT":
+		err := checkArgs(args, 2, "[value]")
+
+		if err != nil {
+			return "", err
+		}
+
+		response = strconv.Itoa(countValues(args[1]))
 	default:
-		response = "Unknown Command"
+		return "", errors.New("unknown command")
 	}
 
 	return response, nil
 }
 
 func checkArgs(args []string, expected int, usage string) error {
-	var expectedUsageNotice = "Expected %s usage: %s"
+	var expectedUsageNotice = "%s expects %d params. Usage: %s"
 
 	if len(args) != expected {
-		return fmt.Errorf(expectedUsageNotice, args[0], args[0]+" "+usage)
+		return fmt.Errorf(expectedUsageNotice, args[0], expected-1, args[0]+" "+usage)
 	}
 
 	return nil

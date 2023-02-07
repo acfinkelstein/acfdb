@@ -28,7 +28,7 @@ func main() {
 
 			// interpreter errors throw for invalid commands and for command usage errors
 			if err != nil {
-				fmt.Println(err.Error())
+				fmt.Println("Error: " + err.Error())
 			}
 
 			if response != "" {
