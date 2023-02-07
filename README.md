@@ -8,6 +8,8 @@ This is a light-weight database developed in Go as part of a technical assessmen
 
 This project contains a Makefile that will facilitate in building and executing the database code.
 
-## Usage
+`make build` will compile the database and generate an executable in the directory `cmd/acfdb`
 
-ACFDB accepts a number of commands as input. The following commands and associated arguments are supported.
+`make run` will run the database program.
+
+## Usage
