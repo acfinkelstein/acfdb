@@ -13,7 +13,17 @@ func Init() {
 }
 
 func setValue(name, value string) {
+	oldValue, update := databaseNames[name]
 	databaseNames[name] = value
+
+	if update {
+		oldCount, ok := databaseValues[oldValue]
+		if ok && oldCount > 0 {
+			oldCount -= 1
+			databaseValues[oldValue] = oldCount
+		}
+	}
+
 	databaseValues[value] += 1
 }
 
