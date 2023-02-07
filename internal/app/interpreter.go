@@ -47,6 +47,23 @@ func Interpret(command string) (string, error) {
 		}
 
 		response = strconv.Itoa(countValues(args[1]))
+	case "BEGIN":
+		err := checkArgs(args, 1, "")
+
+		if err != nil {
+			return "", err
+		}
+
+		beginTransaction()
+
+	case "ROLLBACK":
+		err := checkArgs(args, 1, "")
+
+		if err != nil {
+			return "", err
+		}
+
+		response = rollbackTransaction()
 	default:
 		return "", errors.New("unknown command")
 	}

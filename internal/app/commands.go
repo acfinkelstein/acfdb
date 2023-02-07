@@ -6,10 +6,18 @@ var databaseNames map[string]string
 // maintain a count of names with a value
 var databaseValues map[string]int
 
+// maintain a transaction stack
+var databaseTransactions map[int]transaction
+
+// shortcut to checking whether we have transactions
+var currentTransaction int
+
 func Init() {
 	// start out with a database with 100 available entries and grow as needed.
 	databaseNames = make(map[string]string, 100)
 	databaseValues = make(map[string]int, 100)
+	databaseTransactions = make(map[int]transaction, 5)
+	currentTransaction = -1
 }
 
 func setValue(name, value string) {
@@ -59,4 +67,20 @@ func deleteValue(name string) {
 			databaseValues[value] = count
 		}
 	}
+}
+
+func beginTransaction() {
+	currentTransaction += 1
+	databaseTransactions[currentTransaction] = initTransaction()
+}
+
+func rollbackTransaction() string {
+	if currentTransaction == -1 {
+		return "TRANSACTION NOT FOUND"
+	}
+
+	delete(databaseTransactions, currentTransaction)
+	currentTransaction -= 1
+
+	return ""
 }
