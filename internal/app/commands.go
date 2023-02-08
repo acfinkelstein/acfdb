@@ -15,14 +15,11 @@ func Init() {
 }
 
 func setValue(name, value string) {
-	currentValue, update := getCurrentTransactionValue(name)
+	currentValue, currentCount, update := getCurrentTransactionData(name)
 	setTransactionValue(name, value)
 
-	if update {
-		currentCount, ok := getCurrentTransactionCount(currentValue)
-		if ok && currentCount > 0 {
-			setTransactionCount(currentValue, currentCount-1)
-		}
+	if update && currentCount > 0 {
+		setTransactionCount(currentValue, currentCount-1)
 	}
 
 	newCount, ok := getCurrentTransactionCount(value)
@@ -34,7 +31,7 @@ func setValue(name, value string) {
 }
 
 func getValue(name string) string {
-	value, ok := getCurrentTransactionValue(name)
+	value, _, ok := getCurrentTransactionData(name)
 
 	if ok {
 		return value
@@ -62,15 +59,17 @@ func beginTransaction() {
 	databaseTransactions[currentTransaction] = initTransaction()
 }
 
-func rollbackTransaction() string {
+func rollbackTransaction() bool {
+	// Ensure there is a transaction to rollback
 	if currentTransaction == -1 {
-		return "TRANSACTION NOT FOUND"
+		return false
 	}
 
+	// remove the most recent transaction
 	delete(databaseTransactions, currentTransaction)
 	currentTransaction -= 1
 
-	return ""
+	return true
 }
 
 func commitTransaction() {

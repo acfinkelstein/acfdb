@@ -18,7 +18,7 @@ func main() {
 	var command string
 
 	for command != "END" {
-		fmt.Print(">>")
+		fmt.Print(">> ")
 		commandScanner.Scan()
 
 		command = commandScanner.Text()

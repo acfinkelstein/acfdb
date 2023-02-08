@@ -22,10 +22,10 @@ func initTransaction() transaction {
 	return newTransaction
 }
 
-// scan transactions for the queried name. Return the stored value and whether it hit.
-func getCurrentTransactionValue(name string) (string, bool) {
-
+// get the current transaction's value and count for a particular name
+func getCurrentTransactionData(name string) (string, int, bool) {
 	var currentValue string
+	var currentCount int
 
 	found := false
 	if currentTransaction != -1 {
@@ -33,11 +33,12 @@ func getCurrentTransactionValue(name string) (string, bool) {
 			// If the value is deleted, return as if the key was not found
 			_, hit := databaseTransactions[i].deletedNames[name]
 			if hit {
-				return "", false
+				return "", 0, false
 			}
 
 			currentValue, found = databaseTransactions[i].currentNames[name]
 			if found {
+				currentCount = databaseTransactions[i].currentValues[currentValue]
 				break
 			}
 		}
@@ -46,9 +47,12 @@ func getCurrentTransactionValue(name string) (string, bool) {
 	// if not found in any transaction, return the committed data (if available)
 	if !found {
 		currentValue, found = databaseNames[name]
+		if found {
+			currentCount = databaseValues[currentValue]
+		}
 	}
 
-	return currentValue, found
+	return currentValue, currentCount, found
 }
 
 // set the current value based on whether a transaction is active
@@ -65,7 +69,7 @@ func setTransactionValue(name, value string) {
 
 // delete the current value for the target name.
 func deleteTransactionValue(name string) {
-	value, ok := getCurrentTransactionValue(name)
+	value, count, ok := getCurrentTransactionData(name)
 
 	if ok {
 		if currentTransaction != -1 {
@@ -76,19 +80,12 @@ func deleteTransactionValue(name string) {
 			delete(databaseNames, name)
 		}
 
-		count, ok := getCurrentTransactionCount(value)
-
-		if ok {
-			setTransactionCount(value, count-1)
-		} else {
-			setTransactionCount(value, 0)
-		}
+		setTransactionCount(value, count-1)
 	}
 }
 
 // scan transactions for the queried count. Return the stored count and whether it hit.
 func getCurrentTransactionCount(value string) (int, bool) {
-
 	var currentCount int
 
 	found := false

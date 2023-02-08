@@ -60,7 +60,9 @@ func Interpret(command string) (string, error) {
 			return "", err
 		}
 
-		response = rollbackTransaction()
+		if !rollbackTransaction() {
+			response = "TRANSACTION NOT FOUND"
+		}
 	case "COMMIT":
 		err := checkArgs(args, 1, "")
 
