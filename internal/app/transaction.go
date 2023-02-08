@@ -3,6 +3,7 @@ package app
 type transaction struct {
 	currentNames  map[string]string
 	currentValues map[string]int
+	deletedNames  map[string]bool
 }
 
 // maintain a transaction stack
@@ -15,6 +16,7 @@ func initTransaction() transaction {
 	newTransaction := transaction{
 		currentNames:  make(map[string]string, 10),
 		currentValues: make(map[string]int, 10),
+		deletedNames:  make(map[string]bool, 10),
 	}
 
 	return newTransaction
@@ -28,6 +30,12 @@ func getCurrentTransactionValue(name string) (string, bool) {
 	found := false
 	if currentTransaction != -1 {
 		for i := currentTransaction; i > -1; i-- {
+			// If the value is deleted, return as if the key was not found
+			_, hit := databaseTransactions[i].deletedNames[name]
+			if hit {
+				return "", false
+			}
+
 			currentValue, found = databaseTransactions[i].currentNames[name]
 			if found {
 				break
@@ -47,8 +55,34 @@ func getCurrentTransactionValue(name string) (string, bool) {
 func setTransactionValue(name, value string) {
 	if currentTransaction != -1 {
 		databaseTransactions[currentTransaction].currentNames[name] = value
+
+		// if the name was previously deleted this transaction, remove it from the list of deleted names
+		delete(databaseTransactions[currentTransaction].deletedNames, name)
 	} else {
 		databaseNames[name] = value
+	}
+}
+
+// delete the current value for the target name.
+func deleteTransactionValue(name string) {
+	value, ok := getCurrentTransactionValue(name)
+
+	if ok {
+		if currentTransaction != -1 {
+			// make note of the deleted data in the transaction as well as remove it from the records
+			delete(databaseTransactions[currentTransaction].currentNames, name)
+			databaseTransactions[currentTransaction].deletedNames[name] = true
+		} else {
+			delete(databaseNames, name)
+		}
+
+		count, ok := getCurrentTransactionCount(value)
+
+		if ok {
+			setTransactionCount(value, count-1)
+		} else {
+			setTransactionCount(value, 0)
+		}
 	}
 }
 

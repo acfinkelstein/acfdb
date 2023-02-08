@@ -54,17 +54,7 @@ func countValues(value string) int {
 }
 
 func deleteValue(name string) {
-	value, ok := databaseNames[name]
-
-	if ok {
-		delete(databaseNames, name)
-		count := databaseValues[value]
-
-		if count > 0 {
-			count -= 1
-			databaseValues[value] = count
-		}
-	}
+	deleteTransactionValue(name)
 }
 
 func beginTransaction() {
