@@ -6,12 +6,6 @@ var databaseNames map[string]string
 // maintain a count of names with a value
 var databaseValues map[string]int
 
-// maintain a transaction stack
-var databaseTransactions map[int]transaction
-
-// shortcut to checking whether we have transactions
-var currentTransaction int
-
 func Init() {
 	// start out with a database with 100 available entries and grow as needed.
 	databaseNames = make(map[string]string, 100)

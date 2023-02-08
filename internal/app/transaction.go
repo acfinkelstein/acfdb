@@ -5,6 +5,12 @@ type transaction struct {
 	currentValues map[string]int
 }
 
+// maintain a transaction stack
+var databaseTransactions map[int]transaction
+
+// shortcut to checking whether we have transactions
+var currentTransaction int
+
 func initTransaction() transaction {
 	newTransaction := transaction{
 		currentNames:  make(map[string]string, 10),
