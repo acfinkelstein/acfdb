@@ -72,3 +72,28 @@ func rollbackTransaction() string {
 
 	return ""
 }
+
+func commitTransaction() {
+	if currentTransaction != -1 {
+		for i := 0; i < currentTransaction+1; i++ {
+			transaction := databaseTransactions[i]
+			for name, value := range transaction.currentNames {
+				databaseNames[name] = value
+			}
+			for value, count := range transaction.currentValues {
+				databaseValues[value] = count
+			}
+			for name, deleted := range transaction.deletedNames {
+				if deleted {
+					delete(databaseNames, name)
+				}
+			}
+
+			// cleanup
+			delete(databaseTransactions, i)
+		}
+	}
+
+	// no more transactions
+	currentTransaction = -1
+}

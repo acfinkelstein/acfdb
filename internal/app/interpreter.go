@@ -21,7 +21,6 @@ func Interpret(command string) (string, error) {
 		}
 
 		response = getValue(args[1])
-
 	case "SET":
 		err := checkArgs(args, 3, "[name] [value]")
 
@@ -30,7 +29,6 @@ func Interpret(command string) (string, error) {
 		}
 
 		setValue(args[1], args[2])
-
 	case "DELETE":
 		err := checkArgs(args, 2, "[name]")
 
@@ -55,7 +53,6 @@ func Interpret(command string) (string, error) {
 		}
 
 		beginTransaction()
-
 	case "ROLLBACK":
 		err := checkArgs(args, 1, "")
 
@@ -64,6 +61,14 @@ func Interpret(command string) (string, error) {
 		}
 
 		response = rollbackTransaction()
+	case "COMMIT":
+		err := checkArgs(args, 1, "")
+
+		if err != nil {
+			return "", err
+		}
+
+		commitTransaction()
 	default:
 		return "", errors.New("unknown command")
 	}
