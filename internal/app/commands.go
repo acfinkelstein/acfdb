@@ -15,22 +15,26 @@ func Init() {
 }
 
 func setValue(name, value string) {
-	oldValue, update := databaseNames[name]
-	databaseNames[name] = value
+	currentValue, update := getCurrentTransactionValue(name)
+	setTransactionValue(name, value)
 
 	if update {
-		oldCount, ok := databaseValues[oldValue]
-		if ok && oldCount > 0 {
-			oldCount -= 1
-			databaseValues[oldValue] = oldCount
+		currentCount, ok := getCurrentTransactionCount(currentValue)
+		if ok && currentCount > 0 {
+			setTransactionCount(currentValue, currentCount-1)
 		}
 	}
 
-	databaseValues[value] += 1
+	newCount, ok := getCurrentTransactionCount(value)
+	if ok {
+		setTransactionCount(value, newCount+1)
+	} else {
+		setTransactionCount(value, 1)
+	}
 }
 
 func getValue(name string) string {
-	value, ok := databaseNames[name]
+	value, ok := getCurrentTransactionValue(name)
 
 	if ok {
 		return value
@@ -40,7 +44,7 @@ func getValue(name string) string {
 }
 
 func countValues(value string) int {
-	count, ok := databaseValues[value]
+	count, ok := getCurrentTransactionCount(value)
 
 	if ok {
 		return count
